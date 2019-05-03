@@ -1,5 +1,68 @@
-dfdffdfdfdfdf
-dfdfdf
-dfdfdf
-dfdfd
-fdfdf
+library(tidyverse)
+library(car)
+library(lm.beta)
+library(DAAG)
+
+toyota <- readRDS('Toyota_Price.RDS')
+toyota$FuelType <- as.factor(toyota$FuelType)
+toyota$MetColor <- as.factor(toyota$MetColor)
+toyota$Automatic <- as.factor(toyota$Automatic)
+
+toyota <- toyota[toyota$Price < 27500, ]
+
+set.seed(1234)
+index <- sample(1:2, size=nrow(toyota_df), prob = c(0.7, 0.3), replace = TRUE)
+
+trainSet <- toyota_df[index==1,]
+testSet <- toyota_df[index==2,]
+
+full <- lm(formula = Price~Age+KM+Weight, data = trainSet)
+null <- lm(formula = Price~1, data = trainSet)
+
+fit <- step(object = null, 
+            scope = list(lower=null, upper=full),
+            data = trainSet)
+summary(fit)
+
+shapiro.test(fit$residuals)
+vif(fit)
+lm.beta(fit)
+
+
+trPred <- predict(object = fit, newdata=trainSet, type = 'response')
+trReal <- trainSet$Price
+tePred <- predict(object = fit, newdata=testSet, type = 'response')
+teReal <- testSet$Price
+
+error <- trReal - trPred
+error^2 %>% mean()
+error^2 %>% mean() %>% sqrt()
+error %>% abs() %>% mean()
+(abs(error) / abs(trReal)) %>% mean()
+
+
+
+set.seed(0503)
+height <- rnorm(n=1000, mean=160, sd=5)
+
+summary(height)
+mean(height)
+sd(height)
+IQR(height)
+
+quantile(height, prob=(0.9))
+cut(height, breaks=seq(from=145, to=180, by=5)) %>% table()
+
+par(mfrow=c(1,1))
+iris
+boxplot(x=iris$Sepal.Width)
+
+cor(x=iris$Sepal.Length, y=iris$Sepal.Width, method = 'pearson')
+cor.test(x=iris$Sepal.Length, y=iris$Sepal.Width, method = 'pearson')
+
+var.test(x= iris$Petal.Length[iris$Species == 'setosa'],
+         y= iris$Petal.Length[iris$Species == 'versicolor'])
+
+
+
+
