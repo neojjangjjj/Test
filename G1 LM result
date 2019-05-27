@@ -1,0 +1,101 @@
+## 8조 : 주재준, 김진영, 최용순
+# Data Set : Student Performace on UCI
+# Report Date : '19.05.27
+
+# File > Reopen with Encoding / UTF-8 
+
+# Regression Pilot Prejct
+# Y = G1, G2, G3 등급 회귀 모델 학습
+# X = 33 variables, 395 data 
+
+
+# 변수 초기화
+rm(list=ls())
+
+# Working Directory Set
+getwd()
+setwd("D:/T1/student")
+
+# Read Data Set
+d1=read.table("student-mat.csv",sep=";",header=TRUE)
+d2=read.table("student-por.csv",sep=";",header=TRUE)
+
+# Merge Data Set
+d3=merge(d1,d2,by=c("school","sex","age","address","famsize","Pstatus","Medu","Fedu","Mjob","Fjob","reason","nursery","internet"))
+print(nrow(d3)) # 382 students
+
+# view Data Set
+str(d1)
+summary(d1)
+is.na(d1)
+
+plot(d1)
+
+d1$G2 <- NULL
+d1$G3 <- NULL
+
+intrain <- sample(1:nrow(d1), nrow(d1)*0.8, replace=F)
+train <- d1[intrain,]
+test <- d1[-intrain,]
+
+summary(train)
+
+## train 316
+str(train)
+head(train)
+
+## test 79
+str(test)
+
+
+model_G1 <- lm(train$G1~.,data=train)
+fit <- step(model_G1, direction="both")
+
+model_g1 <- lm(train$G1 ~ sex + Mjob + Fjob + studytime + failures + schoolsup + 
+                 famsup + higher + goout + Walc + health, data = train)
+
+model_g1_1 <- lm(train$G1 ~ sex + studytime + failures + schoolsup + 
+                 famsup + goout + Walc + health, data = train)
+
+AIC(model_g1)
+AIC(model_g1_1)
+summary(model_g1)
+
+anova(model_g1_1, model_g1)
+
+coefficients(fit) # model coefficients
+fitted(fit)
+residuals(fit)
+influence(fit)
+
+if (!require('ggplot2')) install.packages('ggplot2')
+library(ggplot2)
+library(dplyr)
+
+model.pred <- predict(model_g1, newdata = test)
+summary(model.pred)
+head(model.pred)
+
+
+
+# 실제와 예측 비교 
+actuals_preds <-
+  data.frame(cbind(actuals=test$G1, prediction=model.pred)) # make actuals_prediction dataframe.
+correlation_accuracy <- cor(actuals_preds) 
+correlation_accuracy
+head(actuals_preds)
+
+d <- cbind(id=1:79, actuals_preds)
+head(d)
+str(d)
+d
+
+plot(cbind(id=row.names(test), actuals_preds) )
+
+ggplot(d, aes(id))+ 
+  geom_line(aes(y = prediction, colour = 'prediction')) + 
+  geom_line(aes(y = actuals, colour = 'actuals'))
+
+# summary()로 최종모형을 살펴보면 R2=0.2404로 모형이 반응변수의 24.04% 설명한다. 
+# 설명력이 너무 작다고 볼 수도 있지만 통제 불가능한 변인들이 많은 연구에서 이정도의 R2는 
+# 결코 작다고 할 수 없다.
