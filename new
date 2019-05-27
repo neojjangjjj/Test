@@ -96,6 +96,6 @@ ggplot(d, aes(id))+
   geom_line(aes(y = prediction, colour = 'prediction')) + 
   geom_line(aes(y = actuals, colour = 'actuals'))
 
-# summary()로 최종모형을 살펴보면 R2=0.2404로 모형이 반응변수의 24.04% 설명한다. 
+# summary()로 최종모형을 살펴보면 R2=0.2704로 모형이 반응변수의 27.04% 설명한다. 
 # 설명력이 너무 작다고 볼 수도 있지만 통제 불가능한 변인들이 많은 연구에서 이정도의 R2는 
 # 결코 작다고 할 수 없다.
