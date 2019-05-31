@@ -85,6 +85,13 @@ correlation_accuracy <- cor(actuals_preds)
 correlation_accuracy
 head(actuals_preds)
 
+#######################
+# > correlation_accuracy
+#             actuals prediction
+# actuals    1.0000000  0.5359488
+# prediction 0.5359488  1.0000000
+
+
 d <- cbind(id=1:79, actuals_preds)
 head(d)
 str(d)
